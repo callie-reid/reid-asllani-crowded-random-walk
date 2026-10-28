@@ -1,5 +1,5 @@
 % ============================================================
-% spectra_single_run.m
+% figure2_spectra_single_run.m
 %
 % Exact and approximate relaxation spectra for ONE network and
 % ONE value of sigma (crowding function g(x) = (1-x)^sigma).
@@ -17,3 +17,4 @@
 % Requires: MATLAB (Graph functions: graph, conncomp).
 % Network files are in ../data/ and contain the adjacency matrix adj.
 % ============================================================
+
