@@ -1,0 +1,26 @@
+# MATLAB
+*.asv
+*.autosave
+*.m~
+*.mex*
+slprj/
+sccprj/
+codegen/
+octave-workspace
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+
+# LaTeX build files (only if the paper source lives here)
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.bbl
+*.blg
