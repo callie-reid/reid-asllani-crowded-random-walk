@@ -2,7 +2,7 @@
 
 Code and data accompanying the paper by Callie Reid and Malbor Asllani (Department of Mathematics, Florida State University).
 
-**Paper:** [add link or arXiv/DOI when available]
+**Paper:** Link will be added when available.
 
 ## Overview
 
@@ -41,7 +41,7 @@ Install the Python packages with:
 
 Scripts allow users to change parameters and select their own datasets. To reproduce a particular paper panel, use the network and parameter values specified in its caption. Empirical MATLAB scripts require a .mat file containing an adjacency matrix named adj.
 
-Random seeds: [state the seeds used, or note that they are set at the top of each script].
+Synthetic-network scripts set their random seed near the beginning of the script.
 
 ## Data
 
