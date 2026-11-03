@@ -80,32 +80,41 @@ pnode = diag(P_sigma);
 % ============================================================
 % 10) LOCALIZED & RAYLEIGH APPROXIMATIONS
 % ============================================================
-mu_localized = zeros(n,1);
-for mm = 1:n-1
-    eta = eta_idx(mm);
-    mu_localized(mm) = lambda_S(mm) + pnode(eta);
-end
-mu_localized(n) = 0;
 
-delta_R = zeros(n,1);
-for mm = 1:n
-    um = U(:,mm);
-    delta_R(mm) = um.'*P_sigma*um;
-end
-mu_Rayleigh = lambda_S + delta_R;
+% Exclude the baseline conservation mode BEFORE sorting.
+[~, conservationIndex] = min(abs(lambda_S));
+keep = true(n,1);
+keep(conservationIndex) = false;
+
+% Localized approximation.
+hosts = eta_idx(:);
+localized_nonzero = lambda_S(keep) + pnode(hosts(keep));
+
+% Rayleigh approximation.
+U_nonzero = U(:,keep);
+rayleigh_nonzero = sum( ...
+    U_nonzero .* (Jsym * U_nonzero), 1).';
+
+% Exclude the exact conservation eigenvalue.
+[~, exactConservationIndex] = min(abs(mu_exact));
+exact_nonzero = mu_exact;
+exact_nonzero(exactConservationIndex) = [];
 
 % ============================================================
-% 11) SORT APPROXIMATE SPECTRA & CALCULATE ERRORS
+% 11) SORT APPROXIMATE SPECTRA & CALCULATE ABSOLUTE ERRORS
 % ============================================================
-mu_localized_plot = sort(mu_localized,'ascend');
-mu_Rayleigh_plot = sort(mu_Rayleigh,'ascend');
 
-exact_nonzero = mu_exact(1:end-1);
-localized_nonzero = mu_localized_plot(1:end-1);
-rayleigh_nonzero = mu_Rayleigh_plot(1:end-1);
+exact_nonzero = sort(exact_nonzero, 'ascend');
+localized_nonzero = sort(localized_nonzero, 'ascend');
+rayleigh_nonzero = sort(rayleigh_nonzero, 'ascend');
 
 absolute_error_localized = abs(localized_nonzero - exact_nonzero);
 absolute_error_R = abs(rayleigh_nonzero - exact_nonzero);
+
+% Add the conservation zero separately for the full-spectrum plots.
+mu_exact = [exact_nonzero; 0];
+mu_localized_plot = [localized_nonzero; 0];
+mu_Rayleigh_plot = [rayleigh_nonzero; 0];
 
 % ============================================================
 % FIGURE 1: EXACT, BASELINE, RAYLEIGH, & LOCALIZED APPROXIMATION
