@@ -1,5 +1,3 @@
-#Data
-
 # Network data sources
 
 ## Genetic network
