@@ -15,6 +15,7 @@ rng(1);
 % ============================================================
 % Paper Figure 5 uses sigma = 1, a = 0.1, and p = 0.1 or 0.9.
 % Change the parameters below to explore other cases.
+% Current defaults differ from the paper's Figure 5 settings.
 
 sigma = 1.3;
 n = 350;               % total number of nodes
