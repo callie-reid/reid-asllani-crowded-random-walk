@@ -16,9 +16,10 @@ rng(1);
 % ============================================================
 % 1) LOAD NETWORK
 % ============================================================
-% Upload or place your .mat dataset file in the same folder as this script.
-% Ensure the adjacency matrix variable inside the MAT file is named 'adj'.
-networkFile = 'your_dataset_name.mat'; % <-- Change this to your dataset file name
+% Choose any network dataset you want to explore.
+% The MAT file must contain a square adjacency matrix named adj.
+% Set networkFile to the filename or full path of your dataset.
+networkFile = 'your_dataset_name.mat';
 
 scriptFolder = fileparts(mfilename('fullpath'));
 if ~isempty(scriptFolder)
