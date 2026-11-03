@@ -2,7 +2,7 @@
 
 # Network data sources
 
-- **Category:** Genetic network
+## Genetic network
 
 ## Yeast
 
@@ -71,7 +71,7 @@ ability of transcriptional networks, eLife 3, e02863
 (2014).
 
 
-- **Category:** Brain network
+## Brain network
 
 ## Cat
 
@@ -123,7 +123,7 @@ tical high-density counterstream architectures, Proceed-
 ings of the National Academy of Sciences USA 110, 5187
 (2013).
 
-- **Category:** Communication network
+## Communication network
 
 ## DNC
 
@@ -146,7 +146,7 @@ and the 2004 U.S. election: Divided they blog, in Proceed-
 ings of the 3rd International Workshop on Link Discovery
 (ACM Press, 2005) pp. 36–43.
 
-- **Category:** Metabolic network
+## Metabolic network
 
 ## Maayan-Figeys Biological
 
@@ -155,7 +155,7 @@ ings of the 3rd International Workshop on Link Discovery
 ping of human protein–protein interactions by mass spec-
 trometry, Molecular Systems Biology 3, 89 (2007).
 
-- **Category:** Transportation network
+## Transportation network
 
 ## Winnipeg
 
@@ -165,7 +165,7 @@ Transportation networks for research (2026), https:
 //github.com/bstabler/TransportationNetworks, ac-
 cessed 3 August 2026.
 
-- **Category:** Linguistic network
+## Linguistic network
 
 ## Japanese Language
 
@@ -174,7 +174,7 @@ cessed 3 August 2026.
 (2026), https://www.samuel-johnson.org/data, ac-
 cessed 3 August 2026.
 
-- **Category:** Foodwebs network
+## Foodwebs network
 
 ## Grass
 
