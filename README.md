@@ -26,12 +26,12 @@ LICENSE      MIT license (code)
 
 | Figure | Script | Description |
 |--------|--------|-------------|
-| Fig. 1 | `[filename].m` | Spectral deformation on a preferential-attachment network (σ = 1, 0.8, 1.2) |
-| Fig. 2 | `[filename].m` | Empirical network spectra for several σ |
-| Fig. 3 | `[filename].m` | Localization-reduction error and bound vs. m_att |
-| Fig. 4 | `[filename].m` | Erdős–Rényi comparison (p = 0.1, 0.9) |
-| Figs. 5–8 | `[filename].m` | Genetic, brain, communication, and food-web networks |
-| Fig. 9 | `[filename].m` | Comparison of Error 1 and Error 2 across σ |
+| Fig. 1 | `figure1_heatmap_single_run.m` | Spectral deformation on a preferential-attachment network (σ = 1, 0.8, 1.2) |
+| Fig. 2 | `figure2_spectra_error_single_run.m` | Empirical network spectra for several σ |
+| Fig. 3 & 6 | `figure3_figure6_spectra_single_run.m` | Localization-reduction error and bound vs. m_att |
+| Fig. 4 | `figure4.m` | Erdős–Rényi comparison (p = 0.1, 0.9) |
+| Figs. 5 | `figure5a-c_single_run.m` |  `figure5d_single_run.m` | Genetic, brain, communication, and food-web networks |
+| Fig. 7 | `figure7_single_run.py` | Comparison of Error 1 and Error 2 across σ |
 
 Random seeds: [state the seeds used, or note that they are set at the top of each script].
 
@@ -43,7 +43,7 @@ The empirical networks (Table I of the paper) were symmetrized, binarized, strip
 
 If you use this code or data, please cite:
 
-> C. Reid and M. Asllani, "Crowding reshapes relaxation in nonlinear random walks on heterogeneous networks," [journal/arXiv, year]. DOI: [add Zenodo DOI after your first release]
+> C. Reid and M. Asllani, "Crowding reshapes relaxation in nonlinear random walks on heterogeneous networks," 
 
 ## License
 
