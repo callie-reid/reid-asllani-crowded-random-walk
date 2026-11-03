@@ -9,6 +9,9 @@ rng(1);
 % -----------------------------
 % Parameters
 % -----------------------------
+% Paper Figure 5 uses sigma = 1, a = 0.1, and p = 0.1 or 0.9.
+% Change the parameters below to explore other cases.
+
 n  = 500;     % number of nodes
 a  = 0.1;      % nonlinearity parameter
 p1 = 0.1;      % ER edge prob (red)
