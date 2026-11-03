@@ -21,17 +21,21 @@ LICENSE      MIT license (code)
 
 - MATLAB [add version, e.g., R2024b]
 - [List any toolboxes, or write "No additional toolboxes"]
+- Python 
 
 ## Reproducing the figures
 
 | Figure | Script | Description |
 |--------|--------|-------------|
-| Fig. 1 | `figure1_heatmap_single_run.m` | Spectral deformation on a preferential-attachment network (σ = 1, 0.8, 1.2) |
-| Fig. 2 | `figure2_spectra_error_single_run.m` | Empirical network spectra for several σ |
-| Fig. 3 & 6 | `figure3_figure6_spectra_single_run.m` | Localization-reduction error and bound vs. m_att |
-| Fig. 4 | `figure4.m` | Erdős–Rényi comparison (p = 0.1, 0.9) |
-| Figs. 5 | `figure5a-c_single_run.m` |  `figure5d_single_run.m` | Genetic, brain, communication, and food-web networks |
-| Fig. 7 | `figure7_single_run.py` | Comparison of Error 1 and Error 2 across σ |
+| Fig. 1 | `figure1_heatmap_single_run.m` | Heatmaps of crowded relaxation eigenvectors for a selected network |
+| Fig. 2 | `figure2_spectra_error_single_run.m` | Preferential-attachment network spectra and signed localized approximation errors |
+| Figs. 3 & 6 | `figure3_figure6_spectra_single_run.m` | Exact and approximate spectra for selected empirical networks |
+| Fig. 4 | `figure4.m` | Localization-reduction error and bound versus attachment parameter |
+| Fig. 5(a–c) | `figure5a-c_single_run.m` | Spectral comparisons and errors for Erdős–Rényi networks |
+| Fig. 5(d) | `figure5d_single_run.m` | Distributions of the diagonal crowding correction |
+| Fig. 7 | `figure7_single_run.py` | Comparison of Rayleigh and localized approximation errors as sigma varies |
+
+Scripts allow users to change parameters and select their own datasets. To reproduce a particular paper panel, use the network and parameter values specified in its caption. Empirical MATLAB scripts require a .mat file containing an adjacency matrix named adj.
 
 Random seeds: [state the seeds used, or note that they are set at the top of each script].
 
