@@ -13,6 +13,9 @@ rng(1);
 % ============================================================
 % 1) USER PARAMETERS
 % ============================================================
+% Paper Figure 5 uses sigma = 1, a = 0.1, and p = 0.1 or 0.9.
+% Change the parameters below to explore other cases.
+
 sigma = 1.3;
 n = 350;               % total number of nodes
 p = 0.1;               % Edge probability for ER graph
