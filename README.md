@@ -19,9 +19,13 @@ LICENSE      MIT license (code)
 
 ## Requirements
 
-- MATLAB [add version, e.g., R2024b]
-- [List any toolboxes, or write "No additional toolboxes"]
-- Python 
+- MATLAB for Figures 1–6.
+- Python 3 for Figure 7.
+- Python packages: NumPy, SciPy, Matplotlib, and IPython.
+
+Install the Python packages with:
+
+    python -m pip install numpy scipy matplotlib ipython
 
 ## Reproducing the figures
 
