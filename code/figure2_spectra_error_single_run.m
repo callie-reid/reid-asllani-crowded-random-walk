@@ -1,223 +1,172 @@
-clear all;
-close all;
-clc;
+% FIGURE 2: preferential-attachment spectra and signed spectral errors.
+% Change the parameters below to explore other cases.
+% Defaults match the parameter values in the Figure 2 caption.
+% The same network is used for every sigma in this run.
+% Numerical eigenvectors are used without rotating repeated eigenspaces.
+% Exact agreement with the published curves additionally requires the same
+% network realization and eigenvector-basis convention as the paper.
+% This script produces the main plots; it does not recreate the paper's insets.
 
-set(groot, 'defaultAxesFontSize', 18);
-set(groot, 'defaultTextFontSize', 18);
-set(groot, 'defaultAxesLabelFontSizeMultiplier', 1.2);
-set(groot, 'defaultAxesTitleFontSizeMultiplier', 1.3);
-set(groot, 'defaultLegendFontSize', 12);
-set(groot, 'defaultLineLineWidth', 1.4);
-rng(1);
+clearvars; close all; clc;
 
-% ============================================================
-% 1) USER PARAMETERS
-% ============================================================
-sigma = 1.3;
-n = 350;               % total number of nodes
-m0 = 50;               % initial clique size
-matt = 10;             % edges added by each new node
-a = 0.7;
+%% User parameters
+seed = 1;
+n = 350;                 % Total number of nodes
+m0 = 50;                 % Initial complete graph size
+matt = 10;               % Distinct targets per incoming node
+a = 0.7;                 % Stationary-potential parameter (not mean occupancy)
+sigma_spectrum = 1;      % Panel (a)
+sigma_errors = [0.8 1 1.2]; % Panel (b); use one value for a single comparison
 
-% ============================================================
-% 2) BUILD THE PREFERENTIAL-ATTACHMENT NETWORK
-% ============================================================
-if m0 < 1 || matt > m0
-    error('The parameters must satisfy m0 >= 1 and matt <= m0.');
-end
-net = zeros(n,n);
-net(1:m0,1:m0) = ones(m0) - eye(m0);
+validateattributes(n, {'numeric'}, {'scalar','integer','finite','positive'});
+validateattributes(m0, {'numeric'}, {'scalar','integer','finite','>=',2});
+validateattributes(matt, {'numeric'}, {'scalar','integer','finite','positive'});
+validateattributes(a, {'numeric'}, {'scalar','real','finite','positive'});
+validateattributes(sigma_spectrum, {'numeric'}, {'scalar','real','finite','positive'});
+validateattributes(sigma_errors, {'numeric'}, {'vector','real','finite','positive','nonempty'});
+assert(n > m0 && matt <= m0, 'Require n > m0 and matt <= m0.');
+rng(seed, 'twister');
 
+%% Build one preferential-attachment network
+A = zeros(n);
+A(1:m0,1:m0) = ones(m0) - eye(m0);
 for i = m0+1:n
-    degrees = sum(net(1:i-1,1:i-1),2);
-    weights = degrees;
-    targets = zeros(matt,1);
+    weights = sum(A(1:i-1,1:i-1),2);
     available = true(i-1,1);
-    for jj = 1:matt
+    targets = zeros(matt,1);
+    for j = 1:matt
         currentWeights = weights;
         currentWeights(~available) = 0;
-        probabilities = currentWeights ./ sum(currentWeights);
-        cumulativeProbabilities = cumsum(probabilities);
-        r = rand;
-        target = find(cumulativeProbabilities >= r, 1, 'first');
-        targets(jj) = target;
+        cumulative = cumsum(currentWeights / sum(currentWeights));
+        cumulative(end) = 1;
+        target = find(cumulative >= rand, 1, 'first');
+        targets(j) = target;
         available(target) = false;
     end
-    net(i,targets) = 1;
-    net(targets,i) = 1;
+    A(i,targets) = 1;
+    A(targets,i) = 1;
 end
 
-% ============================================================
-% 3) RELABEL NODES BY DECREASING DEGREE
-% ============================================================
-degrees = sum(net,2);
-[~,sortIndex] = sort(degrees,'descend');
-A = net(sortIndex,sortIndex);
+% Keep the original script's decreasing-degree node order.
+[~, order] = sort(sum(A,2), 'descend');
+A = A(order,order);
 k = sum(A,2);
-if any(k == 0)
-    error('The generated graph contains isolated nodes.');
-end
 
-% ============================================================
-% 4) BUILD THE BASELINE SYMMETRIC OPERATOR S
-% ============================================================
-Km12 = spdiags(1./sqrt(k),0,n,n);
-S = Km12*A*Km12 - speye(n);
-Sfull = full(S);
+%% Baseline eigenvectors and conservation mode
+S = A ./ sqrt(k*k.') - eye(n);
+[U,D] = eig(S);
+[lambda, order] = sort(diag(D), 'ascend');
+U = U(:,order);
+U = U ./ sqrt(sum(abs(U).^2,1));
+[~, zeroIndex] = min(abs(lambda));
+assert(abs(lambda(zeroIndex)) < 1e-9, 'Baseline zero mode not found.');
 
-% ============================================================
-% 5) BASELINE EIGENVALUES AND EIGENVECTORS
-% ============================================================
-[U,D] = eig(Sfull);
-lambda_S = diag(D);
-[lambda_S,sortIdx] = sort(lambda_S,'ascend');
-U = U(:,sortIdx);
+% Remove the baseline conservation eigenvector BEFORE approximating/sorting.
+keep = true(n,1);
+keep(zeroIndex) = false;
+lambda_nonzero = lambda(keep);
+U_nonzero = U(:,keep);
+[~, hosts] = max(abs(U_nonzero).^2, [], 1);
+hosts = hosts(:);
 
-% ============================================================
-% 6) HOST NODE OF EACH BASELINE EIGENVECTOR
-% ============================================================
-[peak_val,eta_idx] = max(abs(U),[],1);
-
-% ============================================================
-% 7) EQUILIBRIUM FOR THE SELECTED sigma
-% ============================================================
-xstar = compute_xstar(a,sigma,k);
-
-% ============================================================
-% 8) GENERAL CROWDING FUNCTIONS
-% ============================================================
-g = (1-xstar).^sigma;
-h = (1-xstar).^(sigma-1) .* (1 + (sigma-1).*xstar);
-
-% ============================================================
-% 9) BUILD THE FULL EXACT SYMMETRIC JACOBIAN
-% ============================================================
-Jsym = build_Jsym(A,k,g,h);
-mu_exact = sort(eig(Jsym),'ascend');
-
-% ============================================================
-% 10) CROWDING CORRECTION P_sigma
-% ============================================================
-P_sigma = Jsym - Sfull;
-pnode = diag(P_sigma);
-
-% ============================================================
-% 11) LOCALIZED APPROXIMATION & RAYLEIGH
-% ============================================================
-mu_localized = zeros(n,1);
-for mm = 1:n-1
-    eta = eta_idx(mm);
-    mu_localized(mm) = lambda_S(mm) + pnode(eta);
-end
-mu_localized(n) = 0;
-
-delta_R = zeros(n,1);
-for mm = 1:n
-    um = U(:,mm);
-    delta_R(mm) = um.'*P_sigma*um;
-end
-mu_Rayleigh = lambda_S + delta_R;
-
-% ============================================================
-% 12) SORT APPROXIMATE SPECTRA & CALCULATE ERRORS
-% ============================================================
-mu_localized_plot = sort(mu_localized,'ascend');
-mu_Rayleigh_plot = sort(mu_Rayleigh,'ascend');
-
-exact_nonzero = mu_exact(1:end-1);
-localized_nonzero = mu_localized_plot(1:end-1);
-rayleigh_nonzero = mu_Rayleigh_plot(1:end-1);
-
-absolute_error_localized = abs(localized_nonzero - exact_nonzero);
-absolute_error_R = abs(rayleigh_nonzero - exact_nonzero);
-
-% ============================================================
-% FIGURE 3: FULL SPECTRAL COMPARISON
-% ============================================================
-figure(3);
-clf;
-ix = (1:n)';
-plot(ix,mu_exact, 'b-', 'LineWidth',2.2);
-hold on;
-plot(ix,lambda_S, 'm:', 'LineWidth',2.0);
-plot(ix,mu_Rayleigh_plot, 'g-.', 'LineWidth',1.8);
-plot(ix,mu_localized_plot, 'k--', 'LineWidth',1.8);
-grid on;
-box on;
-xlabel('Eigenvalue index (sorted)', 'FontSize',24);
-ylabel('Eigenvalue', 'FontSize',24);
-legend('Exact', 'Baseline', 'Rayleigh estimate', 'Localized approximation', 'Location','best');
-title(sprintf('Full spectral comparison, \\sigma = %.2f', sigma));
-xlim([1 n]);
-
-% ============================================================
-% FIGURE 4: ABSOLUTE ERROR (LINEAR SCALE)
-% ============================================================
-figure(4);
-clf;
-xerr = (1:n-1)';
-plot(xerr, absolute_error_localized, 'k--', 'LineWidth',1.8);
-hold on;
-plot(xerr, absolute_error_R, 'g-.', 'LineWidth',1.5);
-grid on;
-box on;
-xlabel('Eigenvalue index (sorted)', 'FontSize',24);
-ylabel('Absolute error', 'FontSize',24);
-legend('Localized approximation', 'Rayleigh estimate', 'Location','best');
-title(sprintf('Absolute spectral error, \\sigma = %.2f', sigma));
-xlim([1 n-1]);
-
-% ============================================================
-% LOCAL FUNCTIONS
-% ============================================================
-function Jsym = build_Jsym(A,k,g,h)
-    n = length(k);
-    Jsym = zeros(n,n);
-    for i = 1:n
-        neighbors = find(A(i,:) ~= 0);
-        for jj = 1:length(neighbors)
-            j = neighbors(jj);
-            if i ~= j
-                Jsym(i,j) = A(i,j) / sqrt(k(i)*k(j)) * sqrt(h(i)*h(j));
-            end
-        end
-    end
-    Ag = A*g;
-    for i = 1:n
-        Jsym(i,i) = -(h(i)/(k(i)*g(i))) * Ag(i);
-    end
+%% Evaluate all requested sigma values on this same network
+sigmas = unique([sigma_spectrum, sigma_errors(:).']);
+results = struct([]);
+for j = 1:numel(sigmas)
+    sigma = sigmas(j);
+    [xstar, vacancy] = compute_xstar(a, sigma, k);
+    g = vacancy.^sigma;
+    h = vacancy.^(sigma-1) .* (vacancy + sigma*xstar);
+    scale = sqrt(h./k);
+    Jsym = A .* (scale*scale.');
+    Jsym(1:n+1:end) = -(h./(k.*g)).*(A*g);
     Jsym = 0.5*(Jsym + Jsym.');
+    assert(all(isfinite(Jsym(:))), 'Nonfinite Jacobian entries.');
+
+    exact_all = eig(Jsym);
+    [zeroResidual, exactZeroIndex] = min(abs(exact_all));
+    tolerance = 1e-9 * max(1, max(abs(exact_all)));
+    assert(zeroResidual < tolerance, 'Crowded zero mode not found.');
+    assert(max(exact_all) < tolerance, 'Unexpected positive exact eigenvalue.');
+    exact_all(exactZeroIndex) = [];
+
+    % Both approximations now contain only the n-1 baseline nonzero modes.
+    pnode = diag(Jsym) + 1;
+    rayleigh = sum(U_nonzero .* (Jsym*U_nonzero), 1).';
+    localized = lambda_nonzero + pnode(hosts);
+
+    results(j).sigma = sigma;
+    results(j).exact = sort(exact_all, 'ascend');
+    results(j).rayleigh = sort(rayleigh, 'ascend');
+    results(j).localized = sort(localized, 'ascend');
+    % Equal-rank comparison, not matching eigenvectors between operators.
+    results(j).signed_error = results(j).localized - results(j).exact;
+    results(j).mean_occupancy = mean(xstar);
 end
 
-function xstar = compute_xstar(a,sigma,k)
-    n = length(k);
-    xstar = zeros(n,1);
-    if abs(sigma-1) < 1e-12
-        xstar = a*k ./ (1+a*k);
+%% Panel (a): full spectra, with the exact conservation zero added separately
+spectrumIndex = find(sigmas == sigma_spectrum, 1);
+r = results(spectrumIndex);
+figure('Color','w');
+plot(1:n, [r.exact; 0], 'b-', 'LineWidth',2); hold on;
+plot(1:n, [lambda_nonzero; 0], 'm:', 'LineWidth',1.8);
+plot(1:n, [r.rayleigh; 0], 'g-.', 'LineWidth',1.8);
+plot(1:n, [r.localized; 0], 'k--', 'LineWidth',1.8);
+% Rank 1:n-1 is independently sorted; rank n is the conservation zero.
+xlabel('Eigenvalue index (sorted nonconservation modes; zero last)');
+ylabel('Eigenvalue');
+title(sprintf('Figure 2(a): spectral comparison, \\sigma = %g', sigma_spectrum));
+legend('Exact','Baseline','Rayleigh estimate','Localized approximation', ...
+    'Location','best');
+xlim([1 n]); grid on; box on;
+
+%% Panel (b): SIGNED localized error for each requested sigma
+figure('Color','w'); hold on;
+colors = lines(numel(sigma_errors));
+labels = cell(1,numel(sigma_errors));
+for j = 1:numel(sigma_errors)
+    index = find(sigmas == sigma_errors(j), 1);
+    plot(1:n-1, results(index).signed_error, ...
+        'Color',colors(j,:), 'LineWidth',1.8);
+    labels{j} = sprintf('\\sigma = %g',sigma_errors(j));
+end
+plot([1 n-1], [0 0], ':', 'Color',[0.5 0.5 0.5], ...
+    'HandleVisibility','off');
+xlabel('Eigenvalue index (sorted nonconservation modes)');
+ylabel('Signed error: localized - exact');
+title('Figure 2(b): signed localized spectral error');
+legend(labels, 'Location','best');
+xlim([1 n-1]); grid on; box on;
+
+%% Stationary state: retain vacancy separately for numerical stability
+function [xstar, vacancy] = compute_xstar(a, sigma, k)
+    if sigma == 1
+        vacancy = 1./(1 + a*k);
+        xstar = (a*k)./(1 + a*k);
         return;
     end
-    for i = 1:n
-        target = a*k(i);
-        logtarget = log(target);
-        fun = @(z) z + (sigma-1) .* (max(z,0) + log1p(exp(-abs(z)))) - logtarget;
-        zleft = -50;
-        zright = 50;
-        fleft = fun(zleft);
-        fright = fun(zright);
-        while fleft > 0
-            zleft = zleft - 50;
-            fleft = fun(zleft);
+    xstar = zeros(size(k));
+    vacancy = zeros(size(k));
+    for i = 1:numel(k)
+        logtarget = log(a) + log(k(i));
+        fun = @(z) min(z,0) + sigma*max(z,0) + ...
+            (sigma-1)*log1p(exp(-abs(z))) - logtarget;
+        left = -50; right = 50;
+        while fun(left) > 0
+            left = 2*left;
         end
-        while fright < 0
-            zright = zright + 50;
-            fright = fun(zright);
+        while fun(right) < 0
+            right = 2*right;
         end
-        zstar = fzero(fun, [zleft zright]);
-        if zstar >= 0
-            xstar(i) = 1 / (1 + exp(-zstar));
+        z = fzero(fun, [left right]);
+        if z >= 0
+            ez = exp(-z);
+            xstar(i) = 1/(1+ez);
+            vacancy(i) = ez/(1+ez);
         else
-            ez = exp(zstar);
-            xstar(i) = ez / (1 + ez);
+            ez = exp(z);
+            xstar(i) = ez/(1+ez);
+            vacancy(i) = 1/(1+ez);
         end
     end
 end
