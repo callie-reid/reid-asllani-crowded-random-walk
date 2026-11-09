@@ -39,7 +39,7 @@ Install the Python packages with:
 | Fig. 5(d) | `figure5d_single_run.m` | Distributions of the diagonal crowding correction |
 | Fig. 7 | `figure7_single_run.py` | Comparison of Rayleigh and localized approximation errors as sigma varies |
 
-The scripts are configurable examples. Their default settings are not necessarily the settings used for a published panel. The parameters reported for the existing paper figures are documented in figure_settings.md. Matching those parameters alone does not establish exact agreement with the published curves. Empirical MATLAB examples require a MAT file containing an adjacency matrix named adj.
+The scripts are configurable examples. Their default settings may differ from those used for the published figures. Refer to the paper's figure captions for the reported parameter values. Exact reproduction of individual curves may additionally require the original network realization and numerical eigenvector basis. Empirical MATLAB examples require a MAT file containing an adjacency matrix named adj.
 
 Figure 7's Python script compares the MAT files placed in its input folder and applies one common normalization to that selection. The paper normalizes separately within each network-family panel. The script does not automatically assemble the five-panel paper layout.
 Synthetic-network scripts set their random seed near the beginning of the script.
