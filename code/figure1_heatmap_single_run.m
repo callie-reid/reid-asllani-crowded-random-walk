@@ -33,21 +33,21 @@ assert(n >= 2 && all(k > 0), ...
 g = vacancy.^sigma;
 h = vacancy.^(sigma-1) .* (vacancy + sigma*xstar);
 
-%% Construct Lsym
+%% Construct Jsym
 W = spdiags(sqrt(h./k), 0, n, n);
-Ldiag = -(h./(k.*g)) .* (A*g);
-Lsym = W*A*W + spdiags(Ldiag, 0, n, n);
-Lsym = full(0.5*(Lsym + Lsym.'));
+Jdiag = -(h./(k.*g)) .* (A*g);
+Jsym = W*A*W + spdiags(Jdiag, 0, n, n);
+Jsym = full(0.5*(Jsym + Jsym.'));
 
 %% Relabel nodes by decreasing absolute diagonal entry
-[~, nodeOrder] = sort(abs(diag(Lsym)), 'descend');
-Lsym = Lsym(nodeOrder, nodeOrder);
+[~, nodeOrder] = sort(abs(diag(Jsym)), 'descend');
+Jsym = Jsym(nodeOrder, nodeOrder);
 nodeLabels = originalNodeIndices(nodeOrder);
 % Row i in the heat map corresponds to original node nodeLabels(i).
 
 %% Eigenvectors ordered from most negative eigenvalue to zero
-[V, D] = eig(Lsym);
-[lambda, eigenvalueOrder] = sort(diag(D), 'ascend');
+[V, D] = eig(Jsym);
+[mu, eigenvalueOrder] = sort(diag(D), 'ascend');
 V = V(:, eigenvalueOrder);
 V = V ./ sqrt(sum(abs(V).^2, 1));
 
@@ -59,8 +59,8 @@ colormap(jet);
 cb = colorbar;
 cb.Label.String = '|v_i^{(m)}|';
 xlabel('Eigenvector index: most negative eigenvalue to zero');
-ylabel('Node rank: largest to smallest |L_{ii}|');
-title(sprintf('L_{sym} eigenvectors, \\sigma = %.2f', sigma));
+ylabel('Node rank: largest to smallest |J_{ii}|');
+title(sprintf('J_{sym} eigenvectors, \\sigma = %.2f', sigma));
 axis tight;
 
 %% Local function
