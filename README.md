@@ -6,7 +6,7 @@ Code and data accompanying the paper by Callie Reid and Malbor Asllani (Departme
 
 ## Overview
 
-This repository studies a conservative nonlinear random walk on networks with finite node capacity, where the accessibility of a node with occupancy x is weighted by (1 − x)^σ. The code computes the stationary distribution, the Jacobian relaxation spectrum, and the baseline-mode Rayleigh and localized (host-node and local-star) approximations, and reproduces the figures in the paper.
+This repository studies a conservative nonlinear random walk on networks with finite node capacity, where the accessibility of a node with occupancy x is weighted by (1 − x)^σ. The scripts compute stationary states, crowded relaxation spectra, and baseline-mode Rayleigh, host-node, and local-star estimates. They implement the numerical analyses underlying the paper and provide configurable examples. Exact reproduction of the published curves requires the original network realizations, parameter settings, and numerical eigenvector bases.
 
 ## Repository structure
 
@@ -27,7 +27,7 @@ Install the Python packages with:
 
     python -m pip install numpy scipy matplotlib ipython
 
-## Reproducing the figures
+## Figure scripts and example analyses
 
 | Figure | Script | Description |
 |--------|--------|-------------|
@@ -35,12 +35,13 @@ Install the Python packages with:
 | Fig. 2 | `figure2_spectra_error_single_run.m` | Preferential-attachment network spectra and signed localized approximation errors |
 | Figs. 3 & 6 | `figure3_figure6_spectra_single_run.m` | Exact and approximate spectra for selected empirical networks |
 | Fig. 4 | `figure4.m` | Localization-reduction error and bound versus attachment parameter |
-| Fig. 5(a–c) | `figure5a-c_single_run.m` | Spectral comparisons and errors for Erdős–Rényi networks |
+| Fig. 5(a–c) | `figure5a_c_single_run.m` | Spectral comparisons and errors for Erdős–Rényi networks |
 | Fig. 5(d) | `figure5d_single_run.m` | Distributions of the diagonal crowding correction |
 | Fig. 7 | `figure7_single_run.py` | Comparison of Rayleigh and localized approximation errors as sigma varies |
 
-Scripts allow users to change parameters and select their own datasets. To reproduce a particular paper panel, use the network and parameter values specified in its caption. Empirical MATLAB scripts require a .mat file containing an adjacency matrix named adj.
+The scripts are configurable examples. Their default settings are not necessarily the settings used for a published panel. The parameters reported for the existing paper figures are documented in figure_settings.md. Matching those parameters alone does not establish exact agreement with the published curves. Empirical MATLAB examples require a MAT file containing an adjacency matrix named adj.
 
+Figure 7's Python script compares the MAT files placed in its input folder and applies one common normalization to that selection. The paper normalizes separately within each network-family panel. The script does not automatically assemble the five-panel paper layout.
 Synthetic-network scripts set their random seed near the beginning of the script.
 
 ## Data
