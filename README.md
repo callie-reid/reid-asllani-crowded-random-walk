@@ -11,10 +11,11 @@ This repository studies a conservative nonlinear random walk on networks with fi
 ## Repository structure
 
 ```
-code/        MATLAB scripts for the stationary state, spectra, approximations, and figures
-data/        Network data (see data/README.md for sources and licenses)
-results/     Saved outputs (optional)
-LICENSE      MIT license (code)
+code/        MATLAB and Python examples for stationary states, spectra, and approximations
+data/        Network datasets and source references
+figures/     Archived figures used in the manuscript
+results/     Saved outputs, when available
+LICENSE      MIT license for the code
 ```
 
 ## Requirements
